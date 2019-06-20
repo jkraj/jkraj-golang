@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package flumeConfig;
+
+import "google/api/annotations.proto";
+
+message Config {
+    repeated Agent agent = 1;
+}
+
+message Agent {
+    string name = 1;
+    //repeated string sources = 2;
+    //repeated string channels = 3;
+    //repeated string sinks = 4;
+    Sources sources = 5;
+}
+
+message Sources {
+    Grid grid = 1;
+    Wapi wapi = 2;
+    syslog_source ss = 3;
+}
+
+message Grid {
+    string type = 1;
+    string spoolDir = 2;
+    repeated string channels = 3;
+    // string deletePolicy = 4;
+    // Listvalues channels = 5;
+    //string deserializer = 6;
+    //string fileHeader = 7;
+    Interceptors interceptors = 8;
+}
+
+message Wapi {
+    string type = 1;
+}
+
+message syslog_source {
+    string type = 1;
+}
+
+message Interceptors {
+    repeated string name = 1;
+    repeated Converter converter = 2;
+}
+
+message Selector {
+    string type = 1;
+}
+
+message Converter {
+    string type = 1;
+    string dns_view_default = 2;
+    // ListValue view_mapping = 3;
+    // listvalue tz_mapping = 4;
+    //string global_filters = 5;
+}
+
+message GetCfg {
+
+}
+
+
+//Services for api-tool-kit (for an mock cdc-config-server)
+service FlumeConfig {
+    rpc GetConfig (GetCfg) returns (Config) {
+        option (google.api.http) = {
+            get: "/config"
+        };
+    }
+
+    rpc CreateConfig (Config) returns (Config) {
+        option (google.api.http) = {
+            post: "/config"
+            body: "*"
+        };
+    }
+}

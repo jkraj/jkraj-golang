@@ -34,4 +34,18 @@ func main()  {
 		fmt.Println(reflect.TypeOf(user))
 		fmt.Println(user.Name)
 	}
+
+	// understand basics
+	p := [6]int{1,2,3,4,5,6}
+	fmt.Println(p)
+
+	var s = p[1:4]
+	fmt.Println(s)
+
+	p1 := []int{1,2,3,4}
+	fmt.Println(p1)
+
+	p2 := make([]int, 4, 4)
+	p2 = append(p2, 1,2,3,4,5,6,7)
+	fmt.Println(p2)
 }

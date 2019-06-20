@@ -1,0 +1,198 @@
+syntax = "proto3";
+
+package flumeConfig;
+
+import "google/api/annotations.proto";
+
+message FlumeConfig {
+    Sources sources = 1;
+    Channels channels = 2;
+    Sinks sinks = 3;
+}
+
+message Sources {
+    enum SourcesType {
+        grid = 0;
+        wapi = 1;
+        syslog_source = 2;
+    }
+    repeated SourcesType sources_type = 1;
+    GridConf grid_conf = 2;
+    WapiConf wapi_conf = 3;
+    Syslog_sourceConf syslog_source_conf = 4;
+}
+
+message Channels {
+    enum Channels {
+        splunk_mem = 0;
+        cloud_mem = 1;
+        syslog_channel = 2;
+        wapi_mem = 3;
+        siem_mem = 4;
+    }
+    repeated Channels channels = 1;
+    // No configur
+}
+
+message Sinks {
+    enum SinksConf {
+        spunk_sink = 0;
+        cloud_sink = 1;
+        syslog_sink = 2;
+        wapi_sink = 3;
+        siem_sink = 4;
+    }
+    repeated SinksConf sinks_conf = 1;
+    Splunk_sink splunk_sink_conf = 2;
+    Cloud_sink cloud_sink_conf = 3;
+    Syslog_sink syslog_sink_conf = 4;
+    Wapi_sink wapi_sink_conf = 5;
+    Siem_sink siem_sink_conf = 6;
+}
+
+// Sources
+message GridConf {
+    string spoolDir = 1;
+    Interceptors interceptors = 2;
+}
+
+message WapiConf {
+}
+
+message Syslog_sourceConf {
+    string host = 1; // should default to localhost
+    string port = 2;
+    Interceptors interceptors = 3;
+}
+
+message Interceptors {
+    repeated Converter converter = 1;
+}
+
+message Converter {
+    string type = 1;
+    string dns_view_default = 2;
+    string view_mapping = 3;
+    string tz_mapping = 4;
+    string global_filters = 5;
+}
+
+// Channels
+// No changes allowed as of now
+
+// Sinks
+message Splunk_sink {
+    string directory = 1;
+    string splunk_dir = 2;
+    string reporting_filters = 3;
+    string spunk_filters = 4;
+}
+
+message Cloud_sink {
+    string agent_id = 1;
+    string out_dir = 2;
+    string cloud_filters = 3;
+}
+
+message Syslog_sink {
+    string directory = 1;
+    string view_mapping = 2;
+    string dns_view_default = 3;
+    string cloud_filters = 4;
+}
+
+message Wapi_sink {
+    string directory = 1;
+    string filename_tpl = 2;
+	string global_filters = 3;
+	string cloud_filters = 4;
+}
+
+message Siem_sink {
+    string niosVersion = 1;
+    string niosIp = 2;
+	string arcsight_dir = 3;
+	string mcafee_dir = 4;
+    string logrhythm_dir = 5;
+    string qradar_dir = 6;
+    string arcsight_filters = 7;
+    string mcafee_filters = 8;
+    string logrhythm_filters = 9;
+    string qradar_filters = 10;
+}
+
+message Response {
+    string msg = 1;
+}
+
+message ConfigUpdate {
+    string ophid = 1;
+    string version = 2;
+    string appName = 3;
+}
+
+message StatusObject{
+    string container_name = 1;
+    int64 config_version = 2;
+    string message = 3;
+}
+
+message StatusUpdateRequest{
+    string ophid = 1;
+    string container_name = 2;
+    int64 config_version = 3;
+    string message = 4;
+}
+
+message GetStatusRequest{
+    string ophid = 1;
+}
+
+message GetStatusResponse{
+    StatusObject status = 1;
+}
+
+message GetConfigRequest {
+    string ophid = 1;
+    string appVers = 2;
+}
+
+message GetConfigResponse {
+    ConfigObject config = 1;
+}
+
+//Messages for getting the config from flume-config-server
+message ConfigObject {
+    string ophid = 1;
+    string version = 2;
+    FlumeConfig config = 3;
+}
+
+//Services for api-tool-kit (for an mock cdc-config-server)
+service FlumeConfig {
+    rpc GetConfig (GetConfigRequest) returns (GetConfigResponse) {
+        option (google.api.http) = {
+            get: "/config/{ophid}/{appVers}"
+        };
+    }
+
+    rpc CreateConfig (ConfigObject) returns (Response) {
+        option (google.api.http) = {
+            post: "/config"
+            body: "*"
+        };
+    }
+
+    rpc GetStatus (GetStatusRequest) returns (GetStatusResponse) {
+        option (google.api.http) = {
+            get: "/status/{ophid}"
+        };
+    }
+
+    rpc StatusUpdate (StatusUpdateRequest) returns (Response) {
+        option (google.api.http) = {
+            post: "/status"
+            body: "*"
+        };
+    }
+}

@@ -1,0 +1,51 @@
+package matrixlib
+
+import "errors"
+
+type matrix struct {
+	Size int "Size of matrix"
+	values [][]int "Values of matrix"
+}
+
+/* we can use simillarly 
+type other matrix 
+m1 matrix
+other m2 = other(m1)
+*/
+
+func (m *matrix)GetSize() int { // always will have 1 receiver
+	return m.Size
+}
+
+func NewMatrix(size int) (result matrix, err error) {
+	if size < 1 {
+		return result, errors.New("Invalid size")
+	}
+	result.Size = size
+	result.values = make([][]int, size)
+	for i, _ := range result.values {
+		result.values[i] = make([]int, size)
+	}
+	return
+}
+
+func Add(lhs matrix, rhs matrix) (matrix, error) {
+
+	return matrix{}, nil
+}
+
+func Sub(lhs matrix, rhs matrix) (matrix, error) {
+
+	return matrix{}, nil
+}
+
+// * is needed during declaration but while calling this method & will be used.
+// error is pointer so we can return nil
+func Set(m *matrix, row int, col int, value int) error {
+	return nil
+}
+
+func Get(m *matrix, row int, col int, value int) error {
+
+	return nil
+}
